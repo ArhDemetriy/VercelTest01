@@ -7,8 +7,8 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "test": "jest --watch",
-        "test:ci": "jest --ci",
+        "test": "jest --ci",
+        "test:w": "jest --watch",
         "tsCheck": "npx tsc --noEmit",
         "prCheck": "npm run tsCheck"
     },
