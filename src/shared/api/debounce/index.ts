@@ -1,1 +1,1 @@
-export { debounce } from './effector/debounce'
+export { debounce } from './effectorVersion'
