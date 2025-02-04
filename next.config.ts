@@ -1,7 +1,19 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+    images: {},
+    productionBrowserSourceMaps: true, // TODO удалить перед релизом
+    staticPageGenerationTimeout: 1000,
+    output: 'standalone',
+    webpack(
+        /** @type {import('webpack').Configuration} */
+        config,
+    ) {
+        if (config.externals == null) config.externals = []
+        if (!Array.isArray(config.externals)) config.externals = [config.externals]
 
-export default nextConfig;
+        return config
+    },
+}
+
+export default nextConfig

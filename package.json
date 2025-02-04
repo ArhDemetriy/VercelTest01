@@ -11,33 +11,28 @@
         "prCheck": "npm run tsCheck"
     },
     "dependencies": {
-        "react": "^19.0.0",
-        "react-dom": "^19.0.0",
-        "usehooks-ts": "^3.1.0",
+        "effector": "^23.3.0",
+        "effector-react": "^23.3.0",
         "next": "15.1.6",
-
-        "effector": "^22.8.6",
-        "effector-react": "^22.5.3",
-        "@effector/next": "^0.5.0"
-
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0"
     },
     "devDependencies": {
-        "typescript": "^5",
+        "@eslint/eslintrc": "^3",
         "@types/node": "^20",
         "@types/react": "^19",
         "@types/react-dom": "^19",
-        "ts-pattern": "^5.0.5",
-        "server-only": "^0.0.1",
-        "postcss": "^8",
-        "sass": "^1.58.0",
-        "sass-loader": "^13.2.0",
-        "tailwindcss": "^3.4.1",
+        "cross-env": "^7.0.3",
         "eslint": "^9",
         "eslint-config-next": "15.1.6",
         "eslint-config-prettier": "^8.8.0",
-        "@eslint/eslintrc": "^3",
+        "postcss": "^8",
+        "prettier": "^2.8.4",
+        "sass": "^1.58.0",
         "schema-dts": "^1.1.2",
-        "cross-env": "^7.0.3",
-        "prettier": "^2.8.4"
+        "server-only": "^0.0.1",
+        "tailwindcss": "^3.4.1",
+        "ts-pattern": "^5.0.5",
+        "typescript": "^5"
     }
 }
