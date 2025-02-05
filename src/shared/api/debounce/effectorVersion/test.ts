@@ -1,5 +1,4 @@
-import { getDelay } from '@/shared/utils/delay'
-import { sinkMake_asyncRequest, asyncMake_asyncRequest } from '../mock'
+import { sinkMake_asyncRequest } from '../mock'
 import { makeRCEffectDebounce as debounce } from './debounce'
 
 describe('debounce init', () => {

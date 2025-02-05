@@ -1,6 +1,5 @@
 import {
     type EventPayload,
-    type Event,
     createEffect,
     createEvent,
     createStore,
@@ -100,7 +99,7 @@ interface IConfig {
 export function makeRCEffectDebounce<CB extends FN<any, any>>(cb: CB, config: IConfig) {
     const { sid, debounce = 0 } = config
     const { run, requireRegistered } = initialize<CB>(config)
-    const { toDebounce, forceRemoveDebounce } = makeDebounced<CB>(requireRegistered, config)
+    const { toDebounce } = makeDebounced<CB>(requireRegistered, config)
     const { toInitialize, initializing, initializeDone } = makeInitializing(cb, config)
     const { toActives, actives, doneData } = makeActives<CB>(config)
 
@@ -147,12 +146,6 @@ export function makeRCEffectDebounce<CB extends FN<any, any>>(cb: CB, config: IC
     })
 
     /** toActives */
-    const qwe = sample({
-        clock: initializeDone,
-        source: actives,
-        filter: (actives, { id, time }) => !Object.hasOwn(actives, id) || actives[id].time <= time,
-        fn: (_, clk) => clk,
-    })
     sample({
         clock: sample({
             clock: initializeDone,
