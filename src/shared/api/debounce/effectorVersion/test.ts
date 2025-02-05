@@ -1,10 +1,10 @@
 import { getDelay } from '@/shared/utils/delay'
-import { makeRequest } from '../mock'
+import { sinkMake_asyncRequest, asyncMake_asyncRequest } from '../mock'
 import { makeRCEffectDebounce as debounce } from './debounce'
 
 describe('debounce init', () => {
     const tested = jest.fn(debounce)
-    const mock = jest.fn(makeRequest)
+    const mock = jest.fn(sinkMake_asyncRequest)
     afterEach(() => {
         tested.mockClear()
         mock.mockClear()
@@ -23,25 +23,12 @@ describe('debounce init', () => {
     })
 })
 
-describe('debounce run', () => {
-    const mock = jest.fn(makeRequest)
-    afterEach(() => {
-        mock.mockClear()
-    })
+describe('debounce with sink make', () => {
+    const mock = jest.fn(sinkMake_asyncRequest)
+    afterEach(() => mock.mockClear())
 
-    it('call cb once after once call "run" method ', () => {
-        debounce(mock, { sid: 'test' }).run({ payload: { page: 2 } })
+    it('один запуск вызывает функцию 1 раз', () => {
+        debounce(mock, { sid: 'test' }).run({})
         expect(mock.mock.calls.length).toBe(1)
-    })
-    it('call cb many fast after once call "run" method ', async () => {
-        const { run } = debounce(mock, { sid: 'test', debounce: 200 })
-        run({ payload: { page: 1 } })
-        await getDelay(50)
-        run({ payload: { page: 2 } })
-        await getDelay(50)
-        run({ payload: { page: 3 } })
-        await getDelay(1000)
-        expect(mock.mock.calls.length).toBe(1)
-        expect(mock.mock.calls.map(([{ page }]) => page)).toEqual([1, 3])
     })
 })

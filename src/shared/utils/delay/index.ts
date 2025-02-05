@@ -1,4 +1,4 @@
-export const getDelay = async (delay: number = 0) =>
-    new Promise(resolve => {
-        setTimeout(resolve, delay)
+export const getDelay = async <T>(delay: number = 0, data?: T) =>
+    new Promise<T>(resolve => {
+        setTimeout(resolve, delay, data)
     })
