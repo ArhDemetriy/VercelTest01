@@ -1,1 +1,1 @@
-export { debounce } from './debounce'
+export { makeRCEffectDebounce as debounce } from './debounce'
