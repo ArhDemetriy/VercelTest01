@@ -97,8 +97,8 @@ describe('debounce with sink make', () => {
         expect(mock.mock.calls.length).toBe(1)
     })
 
-    const runTestCalling = (maxCount: number) => {
-        describe(`${maxCount} синхронных попыток вызвать запрос`, () => {
+    const runTestCalling = (maxCount: number) =>
+        describe.skip(`${maxCount} синхронных попыток вызвать запрос`, () => {
             it('Должны триггерить срабатывание только одного вызова.', () => {
                 const { run } = tested(mock, { sid: 'test' })
                 for (let i = 0; i < maxCount; i++) run({ payload: { delayResponse: 0 } })
@@ -118,11 +118,10 @@ describe('debounce with sink make', () => {
                 })
             })
         })
-    }
-    // runTestCalling(1)
-    // runTestCalling(2)
-    // runTestCalling(3)
-    // runTestCalling(300)
+    runTestCalling(1)
+    runTestCalling(2)
+    runTestCalling(3)
+    runTestCalling(300)
 
     const runTestReturns = (maxCount: number) => {
         describe(`${maxCount} синхронных попыток вызвать запрос`, () => {
