@@ -18,10 +18,6 @@ describe('debounce init', () => {
         expect(tested.mock.calls.length).toBe(1)
         expect(mock.mock.calls.length).toBe(0)
     })
-
-    it('export "run" method', () => {
-        expect(tested(mock, { sid: 'test' })?.run).toBeDefined()
-    })
 })
 
 describe('debounce returns', () => {
@@ -48,6 +44,46 @@ describe('debounce returns', () => {
         expect(result.getState()?.data).toBe(data)
         await getDelay(100)
         expect(result.getState()?.data).toBe(data)
+    })
+    describe('return correct data in next macrotask after running', () => {
+        it('для множественных вызовов, возвращает рузультат последнего вызова', async () => {
+            const data1: string = 'data1'
+            const data2: typeof data1 = 'data2'
+            const data3: typeof data1 = 'data3'
+            const { run, doneData } = tested(mock<typeof data1>, { sid: 'test' })
+            const result = sample({
+                clock: doneData,
+                target: createStore<UnitValue<typeof doneData> | null>(null, { sid: 'result' }),
+            })
+            run({ payload: { data: data1 } })
+            run({ payload: { data: data2 } })
+            run({ payload: { data: data3 } })
+
+            await getDelay()
+            expect(result.getState()?.data).toBe(data3)
+            await getDelay(100)
+            expect(result.getState()?.data).toBe(data3)
+        })
+        it('для множественных вызовов, разнесённых во времени, возвращает рузультат последнего вызова', async () => {
+            const data1: string = 'data1'
+            const data2: typeof data1 = 'data2'
+            const data3: typeof data1 = 'data3'
+            const { run, doneData } = tested(mock<typeof data1>, { sid: 'test' })
+            const result = sample({
+                clock: doneData,
+                target: createStore<UnitValue<typeof doneData> | null>(null, { sid: 'result' }),
+            })
+            run({ payload: { data: data1 } })
+            await getDelay(100)
+            run({ payload: { data: data2 } })
+            await getDelay(50)
+            run({ payload: { data: data3 } })
+
+            await getDelay()
+            expect(result.getState()?.data).toBe(data3)
+            await getDelay(100)
+            expect(result.getState()?.data).toBe(data3)
+        })
     })
 })
 
