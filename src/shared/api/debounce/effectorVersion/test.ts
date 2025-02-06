@@ -153,7 +153,7 @@ describe('debounce with sink make', () => {
 
             await getDelay(lastDelay)
             expect(result.getState()?.data).toBe(data3)
-            await getDelay(maxDelay)
+            await getDelay(maxDelay - lastDelay)
             expect(result.getState()?.data).toBe(data3)
             await getDelay(maxDelay * 2)
             expect(result.getState()?.data).toBe(data3)
@@ -169,9 +169,9 @@ describe('debounce with sink make', () => {
 
             await getDelay(minDelay)
             expect(result.getState()?.data).toBe(data1)
-            await getDelay(lastDelay)
+            await getDelay(lastDelay - minDelay)
             expect(result.getState()?.data).toBe(data3)
-            await getDelay(maxDelay)
+            await getDelay(maxDelay - lastDelay - minDelay)
             expect(result.getState()?.data).toBe(data3)
             await getDelay(maxDelay * 2)
             expect(result.getState()?.data).toBe(data3)
