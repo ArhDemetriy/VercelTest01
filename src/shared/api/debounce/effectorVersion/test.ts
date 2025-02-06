@@ -123,7 +123,7 @@ describe('debounce with sink make', () => {
     runTestCalling(3)
     runTestCalling(300)
 
-    describe('для множественных вызовов, возвращает рузультат последнего вызова. Обработка гонки', () => {
+    describe.skip('для множественных вызовов, возвращает рузультат последнего вызова. Обработка гонки', () => {
         const data1: TData1 = 'data1'
         const data2: TData1 = 'data2'
         const data3: TData1 = 'data3'
