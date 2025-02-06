@@ -20,9 +20,10 @@ describe('debounce init', () => {
     })
 })
 
+type TData0 = string
 describe('debounce returns', () => {
     const tested = debounce
-    const mock = sinkMake_asyncRequest
+    const mock = sinkMake_asyncRequest<TData0>
 
     it('export "run" method', () => expect(tested(mock, { sid: 'test' })?.run).toBeDefined())
     it('export loadingList', () =>
@@ -31,30 +32,36 @@ describe('debounce returns', () => {
         expect(tested(mock, { sid: 'test' })?.$isLoading).toBeDefined())
     it('export data', () => expect(tested(mock, { sid: 'test' })?.doneData).toBeDefined())
 
-    it('return correct data in next macrotask after running', async () => {
-        const data = 'data'
-        const { run, doneData } = tested(mock<typeof data>, { sid: 'test' })
-        const result = sample({
-            clock: doneData,
-            target: createStore<UnitValue<typeof doneData> | null>(null, { sid: 'result' }),
-        })
-        run({ payload: { data } })
-
-        await getDelay()
-        expect(result.getState()?.data).toBe(data)
-        await getDelay(100)
-        expect(result.getState()?.data).toBe(data)
-    })
     describe('return correct data in next macrotask after running', () => {
-        it('для множественных вызовов, возвращает рузультат последнего вызова', async () => {
-            const data1: string = 'data1'
-            const data2: typeof data1 = 'data2'
-            const data3: typeof data1 = 'data3'
-            const { run, doneData } = tested(mock<typeof data1>, { sid: 'test' })
+        const data1: TData0 = 'data1'
+        const data2: TData0 = 'data2'
+        const data3: TData0 = 'data3'
+
+        const getEndpoint = () => {
+            const { run, doneData } = tested(mock, { sid: 'test' })
             const result = sample({
                 clock: doneData,
                 target: createStore<UnitValue<typeof doneData> | null>(null, { sid: 'result' }),
             })
+            return { run, result }
+        }
+        let run: ReturnType<typeof getEndpoint>['run']
+        let result: ReturnType<typeof getEndpoint>['result']
+        beforeEach(() => {
+            const endpoint = getEndpoint()
+            run = endpoint.run
+            result = endpoint.result
+        })
+
+        it('return correct data in next macrotask after running', async () => {
+            run({ payload: { data: data1 } })
+
+            await getDelay()
+            expect(result.getState()?.data).toBe(data1)
+            await getDelay(100)
+            expect(result.getState()?.data).toBe(data1)
+        })
+        it('для множественных вызовов, возвращает рузультат последнего вызова', async () => {
             run({ payload: { data: data1 } })
             run({ payload: { data: data2 } })
             run({ payload: { data: data3 } })
@@ -65,14 +72,6 @@ describe('debounce returns', () => {
             expect(result.getState()?.data).toBe(data3)
         })
         it('для множественных вызовов, разнесённых во времени, возвращает рузультат последнего вызова', async () => {
-            const data1: string = 'data1'
-            const data2: typeof data1 = 'data2'
-            const data3: typeof data1 = 'data3'
-            const { run, doneData } = tested(mock<typeof data1>, { sid: 'test' })
-            const result = sample({
-                clock: doneData,
-                target: createStore<UnitValue<typeof doneData> | null>(null, { sid: 'result' }),
-            })
             run({ payload: { data: data1 } })
             await getDelay(100)
             run({ payload: { data: data2 } })
@@ -87,9 +86,10 @@ describe('debounce returns', () => {
     })
 })
 
+type TData1 = string
 describe('debounce with sink make', () => {
     const tested = debounce
-    const mock = jest.fn(sinkMake_asyncRequest)
+    const mock = jest.fn(sinkMake_asyncRequest<TData1>)
     afterEach(() => mock.mockClear())
 
     it('один запуск вызывает функцию 1 раз', () => {
@@ -122,27 +122,4 @@ describe('debounce with sink make', () => {
     runTestCalling(2)
     runTestCalling(3)
     runTestCalling(300)
-
-    const runTestReturns = (maxCount: number) => {
-        describe(`${maxCount} синхронных попыток вызвать запрос`, () => {
-            it('Должны триггерить срабатывание только одного вызова.', () => {
-                const { run } = debounce(mock, { sid: 'test' })
-                for (let i = 0; i < maxCount; i++) run({ payload: { delayResponse: 0 } })
-                expect(mock.mock.calls.length).toBe(1)
-            })
-            describe('Должны триггерить срабатывание только одного вызова.', () => {
-                it('Даже если ответ приходит в рамках текущего макротаска.', () => {
-                    const mock = jest.fn(sinkMake_promiseRequest)
-                    const { run } = debounce(mock, { sid: 'test' })
-                    for (let i = 0; i < maxCount; i++) run({})
-                    expect(mock.mock.calls.length).toBe(1)
-                })
-                it('Даже если ответ приходит с задержкой.', () => {
-                    const { run } = debounce(mock, { sid: 'test' })
-                    for (let i = 0; i < maxCount; i++) run({ payload: { delayResponse: 100 } })
-                    expect(mock.mock.calls.length).toBe(1)
-                })
-            })
-        })
-    }
 })
