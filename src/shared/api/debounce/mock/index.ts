@@ -1,4 +1,4 @@
-import { getDelay } from '@/shared/utils/delay'
+import { getDelay, getPromise } from '@/shared/utils/delay'
 import { IAbortable } from '../types'
 
 interface IMakeRequest<T> {
@@ -27,6 +27,16 @@ export function sinkMake_asyncRequest<T>({
     const result: IAbortable<PromiseLike<typeof data>> = {
         abort: () => {},
         response: getDelay(delayResponse, data),
+    }
+    return result
+}
+
+export function sinkMake_promiseRequest<T>({
+    data,
+}: Omit<IMakeRequest<T>, 'delayInit' | 'delayResponse'> = {}) {
+    const result: IAbortable<Promise<typeof data>> = {
+        abort: () => {},
+        response: getPromise(data),
     }
     return result
 }
