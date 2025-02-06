@@ -122,4 +122,59 @@ describe('debounce with sink make', () => {
     runTestCalling(2)
     runTestCalling(3)
     runTestCalling(300)
+
+    describe('для множественных вызовов, возвращает рузультат последнего вызова. Обработка гонки', () => {
+        const data1: TData1 = 'data1'
+        const data2: TData1 = 'data2'
+        const data3: TData1 = 'data3'
+
+        const getEndpoint = () => {
+            const { run, doneData } = tested(mock, { sid: 'test' })
+            const result = sample({
+                clock: doneData,
+                target: createStore<UnitValue<typeof doneData> | null>(null, { sid: 'result' }),
+            })
+            return { run, result }
+        }
+        let run: ReturnType<typeof getEndpoint>['run']
+        let result: ReturnType<typeof getEndpoint>['result']
+        beforeEach(() => {
+            const endpoint = getEndpoint()
+            run = endpoint.run
+            result = endpoint.result
+        })
+
+        it('игнорирует ответы приходящие после ответа на последний запрос', async () => {
+            const maxDelay = 1000
+            const lastDelay = 50
+            run({ payload: { data: data1, delayResponse: 100 } })
+            run({ payload: { data: data2, delayResponse: maxDelay } })
+            run({ payload: { data: data3, delayResponse: lastDelay } })
+
+            await getDelay(lastDelay)
+            expect(result.getState()?.data).toBe(data3)
+            await getDelay(maxDelay)
+            expect(result.getState()?.data).toBe(data3)
+            await getDelay(maxDelay * 2)
+            expect(result.getState()?.data).toBe(data3)
+        })
+
+        it('если ответ на первый запрос приходит до ответа на последний запрос, возвращает ответ на первый запрос. После, обязательно возвращает ответ на последний запрос', async () => {
+            const minDelay = 50
+            const maxDelay = 1000
+            const lastDelay = 300
+            run({ payload: { data: data1, delayResponse: minDelay } })
+            run({ payload: { data: data2, delayResponse: maxDelay } })
+            run({ payload: { data: data3, delayResponse: lastDelay } })
+
+            await getDelay(minDelay)
+            expect(result.getState()?.data).toBe(data1)
+            await getDelay(lastDelay)
+            expect(result.getState()?.data).toBe(data3)
+            await getDelay(maxDelay)
+            expect(result.getState()?.data).toBe(data3)
+            await getDelay(maxDelay * 2)
+            expect(result.getState()?.data).toBe(data3)
+        })
+    })
 })
